@@ -1,0 +1,30 @@
+{{ define "navbar" }}
+  <nav>
+    <style>
+      me { 
+        margin:0.5rem 0.5rem;
+        background:#edeff0;
+        border-radius:0.5rem;
+        box-shadow: 0 0.2rem 0.4rem 0 rgba(0, 0, 0, 0.2);
+        padding: 0rem 1rem;
+        @media (prefers-color-scheme: dark) { background:#141e26; }
+      }
+    </style>
+    <ul>
+      <li>
+        <style>
+          me { margin:0rem 0.5rem; }
+        </style>
+        <a href="/"><i class="bi bi-subtract"></i></a>
+      </li>
+    </ul>
+    <ul>
+      <style>
+        me { margin:0rem 0.25rem; }
+      </style>
+      <li><a href="/containers">Containers</a></li>
+      <li><a href="#">Deploy</a></li>
+    </ul>
+  </nav>
+{{ end }}
+

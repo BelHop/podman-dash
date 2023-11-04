@@ -1,0 +1,11 @@
+{{ define "results" }}
+<aside>
+  <dialog open>
+    <article>
+      {{ range .queryResults }}
+      <h2>{{ . }}</h2>
+      {{ end }}
+    </article>
+  </dialog>
+</aside>
+{{ end }}

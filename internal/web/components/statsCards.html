@@ -1,0 +1,67 @@
+{{ define "content" }}
+
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.1/dist/cdn.min.js"></script>
+<div class="container" x-data="{ modal: false }">
+  <div class="grid">
+    <article style="text-align:center">
+      <i class="bi bi-floppy2-fill"></i><br>
+      <progress value="{{ .Storage }}" max="1000"></progress>
+      <strong>{{ .Storage }} free</strong>
+    </article>
+    <article style="text-align:center" hx-get="/sys/mem" hx-trigger="every 5s">  
+      {{ block "mem" . }}
+        <i class="bi bi-speedometer2"></i>
+        <progress value="{{ .UsedMemory  }}" max="100"></progress>
+        <strong >{{ .MemoryPercent }}% memory free</strong>
+      {{ end }}
+    </article>
+     <article style="text-align:center">
+      <i class="bi bi-boxes"></i><br>
+      <strong>{{ .PodsNum }} active containers</strong>
+      <footer style="height:2vw;">
+        <button @click="modal = ! modal" style="display:inline-block">Show</button>
+      </footer>
+    </article>
+  </div>
+
+  <div x-show="modal" x-transition>
+    <dialog id="modal" open>
+      <article>
+        <button
+          class="close outline"
+          @click="modal = ! modal">
+        </button>
+        <h3>All available containers</h3>
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">Name(s)</th>
+              <th scope="col">Image</th>
+              <th scope="col">Date created</th>
+              <th scope="col">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {{ range .PodsInfo  }}
+              <tr>
+                <th scope="row">{{ .Names }}</th>
+                <td>{{ .Image }}</td>
+                <td>{{ .Created }}</td>
+                <td>{{ .State }}</td>
+              </tr>
+            {{ end }}
+          </tbody>
+        </table>
+        <footer>
+          <button
+            @click="modal = ! modal"
+            role="button">
+              Exit
+          </button>
+        </footer>
+      </article>
+    </dialog>
+  </div>
+</div>
+
+{{ end }}

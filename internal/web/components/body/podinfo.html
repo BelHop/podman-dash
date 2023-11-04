@@ -1,0 +1,199 @@
+{{ define "content" }}
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.1/dist/cdn.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/gnat/css-scope-inline-block/script.js"></script>
+  <div class="figure" style="margin:0rem 0.5rem">
+  <div x-data="{ results: false }">
+      <style>
+        me {
+          width:40rem;
+          margin:auto;
+        }
+      </style>
+      <form>
+        <input type="search" name="containerSearch" id="containerSearch" placeholder="Search here!" style="text-align:center" 
+        hx-post="/containers/search" hx-trigger="keyup changed delay:1s, search" hx-target="#container-list">
+      </form>
+    </div>
+    <div style="margin:0rem 3rem;" x-data="{ form: false }" id="container-list">
+      {{ block "containers" . }}
+      {{ if .ContainersExist }}
+      {{ range .PodsInfo  }}
+        {{ if eq .State "running" }}
+          <div x-data="{ modal: false  }">
+            <nav x-data="{ running: true  }">
+             <style>
+                me { 
+                  margin:0.5rem 0.5rem;
+                  background:#edeff0;
+                  border-radius:0.5rem;
+                  box-shadow: 0 0.2rem 0.4rem 0 rgba(0, 0, 0, 0.2);
+                  padding: 1.75rem;
+                  @media (prefers-color-scheme: dark) { background:#141e26; }
+                }
+              </style>
+              <div>
+              <strong>{{ index .Names 0 }}</strong><br><br><br>
+              {{ .Image }}
+              </div>
+              <ul id="right">
+                <li><button @click="modal = ! modal"><i class="bi bi-info-square-fill"></i></button></li>
+                <li x-show="running"><button hx-post="/containers/{{ index .Names 0 }}/stop"><i class="bi bi-pause-fill"></i></button></li>
+                <li><button hx-post="/containers/{{ index .Names 0 }}/delete" disabled><i class="bi bi-trash3-fill"></i></button></li>
+              </ul>
+            </nav>
+            <aside x-show="modal" x-transition x-data="{ running: true  }">
+              <dialog id="modal" open>
+                <article @click.outside="modal = ! modal" style="overflow:hidden;">
+                  <button
+                    class="close outline"
+                    @click="modal = ! modal">
+                  </button>
+                  <h3>Container Info</h3>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th scope="col">Name(s)</th>
+                        <th scope="col">Image</th>
+                        <th scope="col">Date created</th>
+                        <th scope="col">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <th scope="row">{{ .Names }}</th>
+                        <td>{{ .Image }}</td>
+                        <td>{{ .Created }}</td>
+                        <td>{{ .State }}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  <footer>
+                    <nav>
+                      <ul>
+                        <li>
+                          <button 
+                          hx-post="/containers/{{ index .Names 0 }}/stop" 
+                          style="display:inline-block">
+                            <i class="bi bi-pause-fill"></i>
+                          </button>
+                        </li>
+                        <li>
+                          <button
+                            @click="modal = ! modal"
+                            role="button"
+                            style="display:inline-block">
+                            Exit
+                          </button>              
+                        </li>
+                      </ul>
+                    </nav>
+                  </footer>
+                </article>
+              </dialog>
+            </aside>
+          </div>
+        {{ else }}
+          <div x-data="{ modal: false }">
+            <nav x-data="{ running: false  }">
+             <style>
+                me { 
+                  margin:0.5rem 0.5rem;
+                  background:#edeff0;
+                  border-radius:0.5rem;
+                  box-shadow: 0 0.2rem 0.4rem 0 rgba(0, 0, 0, 0.2);
+                  padding: 1.75rem;
+                  @media (prefers-color-scheme: dark) { background:#141e26; }
+                }
+              </style>
+              <div>
+              <strong>{{ index .Names 0 }}</strong><br><br><br>
+              {{ .Image }}
+              </div>
+              <ul>
+                <li><button @click="modal = ! modal"><i class="bi bi-info-square-fill"></i></button></li>
+                <li x-show="!running"><button hx-post="/containers/{{ index .Names 0 }}/run"><i class="bi bi-play-fill"></i></button></li>
+                <li><button hx-post="/containers/{{ index .Names 0 }}/delete"><i class="bi bi-trash3-fill"></i></button></li>
+              </ul>
+            </nav>
+            <aside x-show="modal" x-transition x-data="{ running: false  }">
+              <dialog id="modal" open>
+                <article @click.outside="modal = ! modal" style="overflow:hidden;">
+                  <button
+                    class="close outline"
+                    @click="modal = ! modal">
+                  </button>
+                  <h3>Container Info</h3>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th scope="col">Name(s)</th>
+                        <th scope="col">Image</th>
+                        <th scope="col">Date created</th>
+                        <th scope="col">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <th scope="row">{{ .Names }}</th>
+                        <td>{{ .Image }}</td>
+                        <td>{{ .Created }}</td>
+                        <td>{{ .State }}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  <footer>
+                    <nav>
+                      <ul>
+                        <li x-show="!running">
+                          <button 
+                          hx-post="/containers/{{ index .Names 0 }}/run" 
+                          style="display:inline-block">
+                            <i class="bi bi-play-fill"></i>
+                          </button>
+                        </li> 
+                        <li>
+                          <button
+                            @click="modal = ! modal"
+                            role="button"
+                            style="display:inline-block">
+                            Exit
+                          </button>              
+                        </li>
+                      </ul>
+                    </nav>
+                  </footer>
+                </article>
+              </dialog>
+            </aside>
+          </div>
+        {{ end }}
+      {{ else }}
+        <h1>Make more Containers!</h1>
+      {{ end }}
+      {{ end }}
+      {{  end }}
+    </div>
+    <div x-data="{ form: false }" style="margin:3rem 5rem 0rem">
+      <button @click="form = ! form" style="5rem 0rem 0rem">
+        New Container
+      </button>
+      <aside x-show="form" x-transition>
+        <dialog open>
+          <article @click.outside="form = ! form" style="overflow:hidden;">
+            <form hx-post="/containers/new">
+              <div>
+                <label for="container-name">Name:</label>
+                <input type="text" name="name" id="container-name" value=""/>
+              </div>
+              <div>
+                <label for="image-name">Image:</label>
+                <input type="text" name="image" id="image-name" value=""/>
+              </div>
+              <button type="submit">Submit</button> 
+            </form>
+          </article>
+        </dialog>
+      </aside>
+    </div>
+  </div>
+{{ end }}
